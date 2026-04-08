@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiSer - Servitel ISP</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="servitel_logo.png" type="image/png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #ff7800; /* Naranja Vibrante */
+            --primary-hover: #e06900;
+            --secondary: #0d3b66; /* Azul Profundo */
+            --secondary-light: #164f87;
+            --bg-color: #f4f7f6;
+            --surface: #ffffff;
+            --text-dark: #2c3e50;
+            --text-muted: #7f8c8d;
+            --success: #27ae60;
+            --warning: #f1c40f;
+            --danger: #e74c3c;
+            --border: #e0e0e0;
+            --radius: 8px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        h1, h2, h3, h4, h5, h6, .brand-logo {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* --- LOGIN MODULE --- */
+        #login-view {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--secondary) 0%, #0a2e4f 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+        .login-card {
+            background-color: var(--surface);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-card-logo {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .login-card-logo i {
+            color: var(--secondary);
+        }
+        .login-card p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'Raleway', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 120, 0, 0.2);
+        }
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius);
+            font-family: 'Raleway', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            text-align: center;
+        }
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+        .btn-secondary:hover {
+            background-color: var(--secondary-light);
+        }
+
+        /* --- APP LAYOUT --- */
+        #app-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--secondary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .sidebar-header i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+        .nav-menu {
+            list-style: none;
+            padding: 1rem 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            color: rgba(255,255,255,0.7);
+            border-left: 4px solid transparent;
+        }
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 120, 0, 0.1);
+            color: white;
+            border-left-color: var(--primary);
+        }
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Topbar */
+        .topbar {
+            height: 70px;
+            background-color: var(--surface);
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            z-index: 10;
+        }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        /* View Area */
+        .view-area {
+            padding: 2rem;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        .view-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .section-header h2 {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Dashboard Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background-color: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stat-card.blue { border-left-color: var(--secondary); }
+        .stat-card.green { border-left-color: var(--success); }
+        .stat-card.red { border-left-color: var(--danger); }
+        
+        .stat-info h3 {
+            font-family: 'Raleway', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        .stat-info p {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .stat-icon {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.5rem;
+        }
+        .stat-card.blue .stat-icon { background: rgba(13, 59, 102, 0.1); color: var(--secondary); }
+        .stat-card.orange .stat-icon { background: rgba(255, 120, 0, 0.1); color: var(--primary); }
+        .stat-card.green .stat-icon { background: rgba(39, 174, 96, 0.1); color: var(--success); }
+        .stat-card.red .stat-icon { background: rgba(231, 76, 60, 0.1); color: var(--danger); }
+
+        /* Tables */
+        .data-table-container {
+            background-color: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            width: 100%;
+            overflow-x: auto;
+        }
+        .table-controls {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            display: flex; align-items: center;
+            background: #f9f9f9;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            width: 300px;
+        }
+        .search-box input {
+            border: none; background: transparent; outline: none; margin-left: 10px; width: 100%;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-table th, .data-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table th {
+            font-weight: 600;
+            color: var(--secondary);
+            background-color: #fcfcfc;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        .data-table tr:hover {
+            background-color: #fcfcfc;
+        }
+        .badge {
+            padding: 0.3rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge.active { background-color: rgba(39, 174, 96, 0.1); color: var(--success); }
+        .badge.suspended { background-color: rgba(231, 76, 60, 0.1); color: var(--danger); }
+
+        .action-btns {
+            display: flex; gap: 5px;
+        }
+        .btn-icon {
+            width: 32px; height: 32px;
+            border-radius: 4px;
+            border: none; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            color: white; transition: var(--transition);
+        }
+        .btn-edit { background-color: var(--warning); }
+        .btn-suspend { background-color: var(--danger); }
+        .btn-pay { background-color: var(--success); }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center;
+        }
+        .modal.show { display: flex; animation: fadeIn 0.3s ease; }
+        .modal-content {
+            background-color: var(--surface); padding: 2rem; border-radius: var(--radius);
+            width: 100%; max-width: 500px;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-close { cursor: pointer; font-size: 1.5rem; color: var(--text-muted); }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .form-full { grid-column: span 2; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -260px; height: 100%; z-index: 100; }
+            .sidebar.show { left: 0; }
+            .menu-toggle { display: block !important; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-full { grid-column: span 1; }
+        }
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--secondary); }
+
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN MODULE -->
+    <div id="login-view">
+        <div class="login-card">
+            <h1 class="login-card-logo">
+                <i class="fa-solid fa-wifi"></i> WiSer
+            </h1>
+            <p>Panel de Administración Servitel</p>
+            <form id="login-form">
+                <div class="input-group">
+                    <label>Usuario / Email</label>
+                    <input type="text" id="email" placeholder="admin@servitel.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn">Ingresar</button>
+                <div style="margin-top: 15px; font-size: 0.85rem; color: var(--text-muted);">
+                    Nota: Acceso configurado sin roles específicos como se solicitó.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- APP LAYOUT -->
+    <div id="app-view">
+        
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-signal"></i>
+                <h2>Servitel</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-target="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard
+                </li>
+                <li class="nav-item" data-target="clientes">
+                    <i class="fa-solid fa-users"></i> Clientes
+                </li>
+                <li class="nav-item" data-target="finanzas">
+                    <i class="fa-solid fa-wallet"></i> Finanzas
+                </li>
+                <li class="nav-item" data-target="soporte">
+                    <i class="fa-solid fa-headset"></i> Soporte
+                </li>
+                <li style="margin-top: 2rem;"></li>
+                <li class="nav-item" id="btn-logout" style="color: #e74c3c;">
+                    <i class="fa-solid fa-power-off"></i> Cerrar Sesión
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Topbar -->
+            <header class="topbar">
+                <div style="display:flex; align-items:center; gap: 15px;">
+                    <i class="fa-solid fa-bars menu-toggle" id="menu-toggle"></i>
+                    <h3 style="color: var(--secondary); margin:0;">WiSer Portal</h3>
+                </div>
+                <div class="topbar-right">
+                    <div class="user-profile">
+                        <div class="avatar">A</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.9rem;">Admin Servitel</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- View Area -->
+            <div class="view-area">
+                
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="view-section active">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-chart-pie"></i> Dashboard General</h2>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card orange">
+                            <div class="stat-info">
+                                <h3>Ingresos Mes Actual</h3>
+                                <p>$ 1'200.000</p>
+                            </div>
+                            <div class="stat-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+                        </div>
+                        <div class="stat-card blue">
+                            <div class="stat-info">
+                                <h3>Total Clientes</h3>
+                                <p>342</p>
+                            </div>
+                            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                        </div>
+                        <div class="stat-card red">
+                            <div class="stat-info">
+                                <h3>Suspendidos</h3>
+                                <p>15</p>
+                            </div>
+                            <div class="stat-icon"><i class="fa-solid fa-user-lock"></i></div>
+                        </div>
+                        <div class="stat-card green">
+                            <div class="stat-info">
+                                <h3>Tickets Pendientes</h3>
+                                <p>4</p>
+                            </div>
+                            <div class="stat-icon"><i class="fa-solid fa-ticket"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico estático / Simulado -->
+                    <div class="data-table-container" style="padding: 2rem;">
+                        <h3 style="margin-bottom: 1.5rem; font-family: 'Cinzel'; color: var(--secondary);">Historial de Finanzas Anual</h3>
+                        <div style="width: 100%; height: 300px; background: repeating-linear-gradient(0deg, transparent, transparent 49px, #eee 49px, #eee 50px); position: relative; display: flex; align-items: flex-end; justify-content: space-around; padding-top: 20px;">
+                            <div style="width: 40px; height: 60%; background: var(--primary); border-radius: 4px 4px 0 0;" title="Ene"></div>
+                            <div style="width: 40px; height: 80%; background: var(--primary); border-radius: 4px 4px 0 0;" title="Feb"></div>
+                            <div style="width: 40px; height: 75%; background: var(--primary); border-radius: 4px 4px 0 0;" title="Mar"></div>
+                            <div style="width: 40px; height: 90%; background: var(--primary); border-radius: 4px 4px 0 0;" title="Abr"></div>
+                            <div style="width: 40px; height: 40%; background: rgba(255, 120, 0, 0.4); border-radius: 4px 4px 0 0;" title="May (Proyección)"></div>
+                            <div style="width: 40px; height: 10%; background: transparent;"></div>
+                            <div style="width: 40px; height: 10%; background: transparent;"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Clientes Section -->
+                <section id="clientes" class="view-section">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-users"></i> Lista de Clientes</h2>
+                        <button class="btn" id="btn-add-client"><i class="fa-solid fa-plus"></i> Agregar Cliente</button>
+                    </div>
+
+                    <div class="data-table-container">
+                        <div class="table-controls">
+                            <div class="search-box">
+                                <i class="fa-solid fa-search" style="color: var(--text-muted);"></i>
+                                <input type="text" id="search-client" placeholder="Buscar por nombre o IP...">
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn btn-secondary" title="Generar facturas a todos (1 de cada mes)">Facturar Mes</button>
+                                <button class="btn" style="background:var(--danger)" title="Cortar servicio a morosos">Cortes Automáticos</button>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Servicio (Dirección)</th>
+                                    <th>IP</th>
+                                    <th>Plan Internet</th>
+                                    <th>Router</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clients-tbody">
+                                <!-- Filas generadas por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Finanzas Section -->
+                <section id="finanzas" class="view-section">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-wallet"></i> Control de Finanzas</h2>
+                    </div>
+                    <div class="data-table-container" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                        <i class="fa-solid fa-file-invoice-dollar" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                        <h3>Módulo de Gestión de Pagos</h3>
+                        <p>Las facturas se generan cada 1er día del mes (Cobro Anticipado).</p>
+                    </div>
+                </section>
+
+                <!-- Soporte Section -->
+                <section id="soporte" class="view-section">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-headset"></i> Tickets de Soporte Técnico</h2>
+                    </div>
+                    <div class="data-table-container" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                        <i class="fa-solid fa-toolbox" style="font-size: 3rem; color: var(--secondary); margin-bottom: 1rem;"></i>
+                        <h3>Área de Soporte Integrada</h3>
+                        <p>Crea incidencias para los técnicos en campo.</p>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="modal-client">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="font-family:'Cinzel'; color:var(--secondary);" id="modal-title">Registrar Nuevo Cliente</h3>
+                <span class="modal-close" id="close-modal">&times;</span>
+            </div>
+            <form id="form-client">
+                <div class="form-grid">
+                    <div class="input-group form-full">
+                        <label>Nombre Completo</label>
+                        <input type="text" id="c-name" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Dirección / Zona</label>
+                        <input type="text" id="c-address" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Dirección IP</label>
+                        <input type="text" id="c-ip" placeholder="192.168.1.100" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Plan de Internet</label>
+                        <select id="c-plan" style="width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: var(--radius); font-family: 'Raleway';" required>
+                            <option value="Plan Plata 6 Megas">Plan Plata 6 Megas</option>
+                            <option value="Plan Oro 20 Megas">Plan Oro 20 Megas</option>
+                            <option value="Plan Zafiro 50 Megas">Plan Zafiro 50 Megas</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Router Board / Equipo</label>
+                        <input type="text" id="c-router" placeholder="Mikrotik / TPLink">
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem; text-align: right;">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel" style="width: auto; margin-right: 10px;">Cancelar</button>
+                    <button type="submit" class="btn" style="width: auto;">Guardar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- APP LOGIC (JS) -->
+    <!-- Supabase SDK (Configuración preparada) -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Mock Data ---
+            let clientes = [
+                { id: 1, nombre: "LILIANA NUÑEZ", direccion: "BUENAVISTA", ip: "172.0.0.122", estado: "Activo", plan: "Plan Plata 6 Megas", router: "MIRAVALLE" },
+                { id: 2, nombre: "SANDRA CLAUDIA", direccion: "LOS PINOS MZA 2", ip: "172.0.0.102", estado: "Activo", plan: "Plan Zafiro 50 Megas", router: "RAYITO" },
+                { id: 3, nombre: "CARMEN ELENA", direccion: "SAN LUIS", ip: "192.168.1.170", estado: "Suspendido", plan: "Plan Oro 20 Megas", router: "SAN JUAN" },
+                { id: 4, nombre: "ALVARO PINZON", direccion: "MIRAVALLE DEL SUR", ip: "172.0.0.188", estado: "Activo", plan: "Plan Zafiro 50 Megas", router: "MIRAVALLE" },
+            ];
+
+            // --- UI Elements ---
+            const loginView = document.getElementById('login-view');
+            const appView = document.getElementById('app-view');
+            const loginForm = document.getElementById('login-form');
+            const btnLogout = document.getElementById('btn-logout');
+            
+            const navItems = document.querySelectorAll('.nav-item[data-target]');
+            const sections = document.querySelectorAll('.view-section');
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+
+            // --- Authentication Simulation ---
+            // If we have token, show app.
+            if(localStorage.getItem('wiser_auth') === 'true') {
+                showApp();
+            }
+
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Aquí iría la autenticación real con Supabase
+                // const { user, error } = await supabase.auth.signInWithPassword({ email, password });
+                
+                // Simulación:
+                localStorage.setItem('wiser_auth', 'true');
+                showApp();
+            });
+
+            btnLogout.addEventListener('click', () => {
+                // Supabase: await supabase.auth.signOut();
+                localStorage.removeItem('wiser_auth');
+                hideApp();
+            });
+
+            function showApp() {
+                loginView.style.opacity = '0';
+                setTimeout(() => {
+                    loginView.style.display = 'none';
+                    appView.style.display = 'flex';
+                    renderClients();
+                }, 500);
+            }
+
+            function hideApp() {
+                appView.style.display = 'none';
+                loginView.style.display = 'flex';
+                setTimeout(() => { loginView.style.opacity = '1'; }, 50);
+            }
+
+            // --- Navigation Logic ---
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // Update active class on nav
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+
+                    // Hide all sections, show target
+                    const targetId = item.getAttribute('data-target');
+                    sections.forEach(sec => sec.classList.remove('active'));
+                    document.getElementById(targetId).classList.add('active');
+
+                    // Close sidebar on mobile
+                    if(window.innerWidth <= 768) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            });
+
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('show');
+            });
+
+            // --- Clients Logic ---
+            const tbody = document.getElementById('clients-tbody');
+            const searchInput = document.getElementById('search-client');
+
+            function renderClients(filter = "") {
+                tbody.innerHTML = '';
+                const filtered = clientes.filter(c => 
+                    c.nombre.toLowerCase().includes(filter.toLowerCase()) || 
+                    c.ip.includes(filter)
+                );
+
+                filtered.forEach(c => {
+                    const statusClass = c.estado === 'Activo' ? 'active' : 'suspended';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight:600;">${c.nombre}</td>
+                        <td style="color:var(--text-muted); font-size:0.9rem;">${c.direccion}</td>
+                        <td>${c.ip}</td>
+                        <td>${c.plan}</td>
+                        <td>${c.router}</td>
+                        <td><span class="badge ${statusClass}">${c.estado}</span></td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-icon btn-pay" title="Registrar Pago" onclick="alert('Registrar pago para ${c.nombre}')"><i class="fa-solid fa-money-bill"></i></button>
+                                <button class="btn-icon btn-edit" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn-icon btn-suspend" title="${c.estado === 'Activo' ? 'Suspender' : 'Reactivar'}" onclick="toggleStatus(${c.id})"><i class="fa-solid fa-${c.estado === 'Activo' ? 'lock' : 'unlock'}"></i></button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            searchInput.addEventListener('input', (e) => {
+                renderClients(e.target.value);
+            });
+
+            // Globals func for inline calls
+            window.toggleStatus = function(id) {
+                const client = clientes.find(c => c.id === id);
+                if(client) {
+                    client.estado = client.estado === 'Activo' ? 'Suspendido' : 'Activo';
+                    renderClients(searchInput.value);
+                }
+            }
+
+            // Modal Logic
+            const modal = document.getElementById('modal-client');
+            const btnAdd = document.getElementById('btn-add-client');
+            const btnClose = document.getElementById('close-modal');
+            const btnCancel = document.getElementById('btn-cancel');
+            const formClient = document.getElementById('form-client');
+
+            function closeModal() { modal.classList.remove('show'); formClient.reset(); }
+            
+            btnAdd.addEventListener('click', () => modal.classList.add('show'));
+            btnClose.addEventListener('click', closeModal);
+            btnCancel.addEventListener('click', closeModal);
+            window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+            formClient.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newClient = {
+                    id: Date.now(),
+                    nombre: document.getElementById('c-name').value.toUpperCase(),
+                    direccion: document.getElementById('c-address').value.toUpperCase(),
+                    ip: document.getElementById('c-ip').value,
+                    plan: document.getElementById('c-plan').value,
+                    router: document.getElementById('c-router').value.toUpperCase() || 'N/A',
+                    estado: 'Activo'
+                };
+                clientes.push(newClient);
+                renderClients();
+                closeModal();
+            });
+
+        });
+    </script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW Registrado: ', reg.scope))
+                .catch(err => console.log('Error registro SW: ', err));
+            });
+        }
+    </script>
+</body>
+</html>

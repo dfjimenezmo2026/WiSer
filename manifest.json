@@ -1,0 +1,17 @@
+{
+  "name": "WiSer - Servitel ISP",
+  "short_name": "WiSer",
+  "description": "Sistema de gestión de clientes y pagos para Servitel ISP",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f7f6",
+  "theme_color": "#0d3b66",
+  "icons": [
+    {
+      "src": "servitel_logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
